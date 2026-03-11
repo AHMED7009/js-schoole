@@ -143,7 +143,7 @@
         </section>
 
         <section id="view-challenges" class="hidden">
-            <div class="quiz-card" data-aos="zoom-in">
+            <div class="quiz-card" data-aos="zoom-in" style="max-width: 600px;">
                 <button onclick="navigateTo('welcome')" style="color:var(--primary); background:none; border:none; cursor:pointer; font-weight:bold; margin-bottom:10px">← العودة للرئيسية</button>
                 <h2 id="ch-q-text" style="margin-bottom:20px">السؤال...</h2>
                 <input type="text" id="ch-input" placeholder="اكتب الحل هنا...">
@@ -158,7 +158,6 @@
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // Data
         const assessmentQs = [
             { q: "ما هي الطريقة الصحيحة لتعريف ثابت في JS؟", opts: ["var", "let", "const"], correct: 2, level: "مبتدئ جداً" },
             { q: "كيف نكتب تعليقاً من سطر واحد؟", opts: ["# comment", "// comment", "/* comment */"], correct: 1, level: "مبتدئ" },
@@ -167,43 +166,46 @@
             { q: "ما هي مخرجات typeof null؟", opts: ["null", "undefined", "object"], correct: 2, level: "محترف" }
         ];
 
+        const lessonsData = [
+            { id: 1, title: "المتغيرات (Variables)", short: "تعلم كيفية تخزين البيانات.", full: "تستخدم للمتغيرات والثوابت.", summary: "المتغيرات حاويات للبيانات.", code: "const x = 5;", output: "5" },
+            { id: 2, title: "أنواع البيانات", short: "نصوص، أرقام، منطق.", full: "شرح الأنواع الأساسية.", summary: "String, Number, Boolean.", code: "let x = 'JS';", output: "string" },
+            { id: 3, title: "الدوال (Functions)", short: "إعادة استخدام الكود.", full: "الدوال هي لبنة الأساس.", summary: "Functions allow code reuse.", code: "function test(){}", output: "undefined" },
+            { id: 4, title: "المصفوفات", short: "قوائم البيانات.", full: "ترتيب العناصر.", summary: "Array stores elements.", code: "let arr = [1,2];", output: "Array" },
+            { id: 5, title: "الكائنات", short: "البيانات المركبة.", full: "خصائص وقيم.", summary: "Objects hold complex data.", code: "let obj = {a:1};", output: "1" },
+            { id: 6, title: "الشروط (If)", short: "اتخاذ القرارات.", full: "التحكم في المسارات.", summary: "If/Else logic.", code: "if(true){}", output: "null" },
+            { id: 7, title: "الحلقات (Loops)", short: "التكرار التلقائي.", full: "تنفيذ المهام المتكررة.", summary: "For/While loops.", code: "for(let i=0;i<5;i++){}", output: "0,1,2,3,4" }
+        ];
+
         const challengesData = [
-            { id: 1, q: "عرّف متغير ثابت باسم SITE قيمته 'Google'", ans: "const SITE = 'Google';" },
-            { id: 2, q: "ما هو ناتج 5 + '5'؟", ans: "55" },
-            { id: 3, q: "اكتب دالة باسم hi تعيد كلمة 'أهلاً'", ans: "function hi(){return 'أهلاً';}" }
-            // يمكنك إضافة المزيد هنا..
+            { id: 1, q: "عرف متغير ثابت باسم SITE قيمته 'Google'", ans: "const SITE = 'Google';" },
+            { id: 2, q: "ناتج 5 + '5'؟", ans: "55" },
+            { id: 3, q: "اكتب دالة باسم hi تعيد كلمة 'أهلاً'", ans: "function hi(){return 'أهلاً';}" },
+            { id: 4, q: "كيف نصل للعنصر الأول في مصفوفة arr؟", ans: "arr[0]" },
+            { id: 5, q: "نوع البيانات للـ NaN؟", ans: "number" },
+            { id: 6, q: "حول النص '10' لرقم؟", ans: "parseInt('10')" },
+            { id: 7, q: "ناتج typeof true؟", ans: "boolean" },
+            { id: 8, q: "باقي قسمة 10 على 3؟", ans: "1" },
+            { id: 9, q: "طول مصفوفة users؟", ans: "users.length" },
+            { id: 10, q: "كلمة للمتغير القابل للتغيير؟", ans: "let" },
+            { id: 11, q: "كيف نخرج شيء في الكونسول؟", ans: "console.log" },
+            { id: 12, q: "رمز للضرب في JS؟", ans: "*" },
+            { id: 13, q: "رمز للمساواة التامة؟", ans: "===" },
+            { id: 14, q: "كيف تنهي سطر الكود؟", ans: ";" },
+            { id: 15, q: "هل الدالة كائن في JS؟", ans: "true" }
         ];
 
         let points = 0, currentAssessIdx = 0, assessScore = 0, currentChIdx = 0;
 
-        function navigateTo(viewId) {
-            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
-            document.getElementById('view-' + viewId).classList.remove('hidden');
-        }
-
-        // Assessment Logic
+        function navigateTo(v) { document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden')); document.getElementById('view-'+v).classList.remove('hidden'); }
         function startAssessment() { navigateTo('assessment'); renderAssessQ(); }
         function renderAssessQ() {
             const q = assessmentQs[currentAssessIdx];
-            document.getElementById('diff-tag').innerText = `صعوبة السؤال: ${q.level}`;
+            document.getElementById('diff-tag').innerText = q.level;
             document.getElementById('assess-q-text').innerText = q.q;
-            const container = document.getElementById('assess-options');
-            container.innerHTML = '';
-            q.opts.forEach((opt, i) => {
-                const b = document.createElement('button');
-                b.className = 'lesson-btn';
-                b.innerText = opt;
-                b.onclick = () => {
-                    if(i === q.correct) assessScore++;
-                    currentAssessIdx++;
-                    if(currentAssessIdx < assessmentQs.length) renderAssessQ();
-                    else showWelcome();
-                };
-                container.appendChild(b);
-            });
+            const container = document.getElementById('assess-options'); container.innerHTML = '';
+            q.opts.forEach((opt, i) => { const b = document.createElement('button'); b.className = 'lesson-btn'; b.innerText = opt; b.onclick = () => { if(i === q.correct) assessScore++; currentAssessIdx++; currentAssessIdx < assessmentQs.length ? renderAssessQ() : showWelcome(); }; container.appendChild(b); });
         }
 
-        // Challenge Logic
         function startChallenges() { navigateTo('challenges'); renderChallengeQ(); }
         function renderChallengeQ() {
             const ch = challengesData[currentChIdx];
@@ -211,45 +213,23 @@
             document.getElementById('ch-input').value = "";
             document.getElementById('ch-msg').innerText = "";
         }
-
         function checkChallenge() {
-            const input = document.getElementById('ch-input');
-            const msg = document.getElementById('ch-msg');
+            const val = document.getElementById('ch-input').value.trim();
             const ch = challengesData[currentChIdx];
-
-            if(input.value.trim() === "") return;
-
-            if(input.value.trim().replace(/\s/g, '') === ch.ans.replace(/\s/g, '')) {
-                points += 20;
-                document.getElementById('pts').innerText = points;
-                msg.innerHTML = "✅ إجابة صحيحة! +20 نقطة";
-                msg.style.color = "#4eff4e";
+            if(val.replace(/\s/g, '') === ch.ans.replace(/\s/g, '')) {
+                points+=20; document.getElementById('pts').innerText = points;
+                document.getElementById('ch-msg').innerHTML = "✅ صحيح!"; document.getElementById('ch-msg').style.color = "#4eff4e";
                 setTimeout(nextChallenge, 1000);
-            } else {
-                input.classList.add('error-input');
-                msg.innerHTML = "❌ خطأ، حاول مجدداً";
-                msg.style.color = "#ff4d4d";
-                setTimeout(() => input.classList.remove('error-input'), 500);
-            }
+            } else { document.getElementById('ch-input').classList.add('error-input'); setTimeout(()=>document.getElementById('ch-input').classList.remove('error-input'), 500); }
         }
+        function nextChallenge() { currentChIdx++; currentChIdx < challengesData.length ? renderChallengeQ() : (alert("أنهيت التحديات!"), navigateTo('welcome')); }
 
-        function nextChallenge() {
-            currentChIdx++;
-            if(currentChIdx < challengesData.length) renderChallengeQ();
-            else { alert("تم إنهاء جميع التحديات!"); navigateTo('welcome'); }
-        }
+        function showWelcome() { document.getElementById('level-msg').innerText = "تم تقييم مستواك."; navigateTo('welcome'); }
+        function renderLessons() { document.getElementById('lessons-list').innerHTML = lessonsData.map(l => `<div class="lesson-btn" onclick="viewDetail(${l.id})"><h3>${l.title}</h3><p>${l.short}</p></div>`).join(''); }
+        function viewDetail(id) { const l = lessonsData.find(x=>x.id==id); document.getElementById('lesson-content').innerHTML = `<h1>${l.title}</h1><p>${l.full}</p><code>${l.code}</code><div class="output-box">${l.output}</div>`; navigateTo('lesson-detail'); }
 
-        function showWelcome() {
-            let levelLabel = assessScore >= 4 ? "محترف (Senior)" : (assessScore >= 2 ? "متوسط (Mid-Level)" : "مبتدئ (Junior)");
-            document.getElementById('level-msg').innerText = `أحسنت! مسارك التعليمي هو: ${levelLabel}.`;
-            navigateTo('welcome');
-        }
-
-        AOS.init();
-        document.getElementById('themeToggle').onclick = () => {
-            const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', theme);
-        };
+        AOS.init(); renderLessons();
+        document.getElementById('themeToggle').onclick = () => document.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
     </script>
 </body>
 </html>
