@@ -112,14 +112,7 @@
             <div class="quiz-card" data-aos="zoom-in">
                 <div id="diff-tag" style="font-size: 0.7rem; color: var(--primary); letter-spacing: 2px; margin-bottom: 10px;">LEVEL 1</div>
                 <h2 id="assess-q-text" style="margin-bottom:30px">السؤال...</h2>
-                
-                <input type="text" id="assess-input" placeholder="اكتب إجابتك هنا...">
-                
-                <div style="display:flex; gap:10px; margin-top:20px">
-                    <button class="btn-primary" onclick="submitAssessment()">إرسال الإجابة</button>
-                    <button class="lesson-btn" style="padding:14px 30px" onclick="skipAssessment()">تخطي (Skip)</button>
-                </div>
-                <p id="assess-msg" style="margin-top:15px; font-weight:bold"></p>
+                <div id="assess-options" class="lessons-grid" style="grid-template-columns: 1fr;"></div>
             </div>
         </section>
 
@@ -128,8 +121,8 @@
                 <h1 class="welcome-msg">مرحباً بك أيها المبرمج الطموح! 🚀</h1>
                 <p id="level-msg" style="font-size:1.2rem; margin-bottom:40px"></p>
                 <div class="lessons-grid" style="max-width:800px; margin:auto">
-                    <button class="btn-primary" onclick="navigateTo('lessons')"><i class="fas fa-book"></i> المكتبة المعرفية</button>
-                    <button class="btn-primary" onclick="navigateTo('challenges')"><i class="fas fa-code"></i> مركز التحديات</button>
+                    <button class="btn-primary" onclick="navigateTo('lessons')"><i class="fas fa-book"></i> استكشاف المكتبة المعرفية</button>
+                    <button class="btn-primary" onclick="startChallenges()"><i class="fas fa-code"></i> دخول مركز التحديات</button>
                 </div>
             </div>
         </section>
@@ -150,140 +143,109 @@
         </section>
 
         <section id="view-challenges" class="hidden">
-            <div style="padding:40px 5%">
-                <button onclick="navigateTo('welcome')" style="color:var(--primary); background:none; border:none; cursor:pointer; font-weight:bold; margin-bottom:20px">← العودة للرئيسية</button>
-                <h1 style="margin-bottom:30px">مركز التحديات والمهارات 🏆</h1>
-                <div id="challenges-list" class="lessons-grid"></div>
+            <div class="quiz-card" data-aos="zoom-in">
+                <button onclick="navigateTo('welcome')" style="color:var(--primary); background:none; border:none; cursor:pointer; font-weight:bold; margin-bottom:10px">← العودة للرئيسية</button>
+                <h2 id="ch-q-text" style="margin-bottom:20px">السؤال...</h2>
+                <input type="text" id="ch-input" placeholder="اكتب الحل هنا...">
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-primary" onclick="checkChallenge()">إرسال الإجابة</button>
+                    <button class="lesson-btn" style="padding: 14px 30px;" onclick="nextChallenge()">تخطي (Skip)</button>
+                </div>
+                <p id="ch-msg" style="margin-top:15px; font-weight:bold"></p>
             </div>
         </section>
     </main>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
+        // Data
         const assessmentQs = [
-            { q: "ما هي الكلمة المفتاحية لتعريف ثابت؟", ans: "const", level: "مبتدئ جداً" },
-            { q: "كيف نكتب تعليقاً من سطر واحد؟", ans: "//", level: "مبتدئ" },
-            { q: "ما ناتج 2 + '2'؟", ans: "22", level: "متوسط" },
-            { q: "دالة تحويل النص لرقم صحيح؟", ans: "parseInt", level: "متقدم" },
-            { q: "نوع البيانات لـ null هو؟", ans: "object", level: "محترف" }
+            { q: "ما هي الطريقة الصحيحة لتعريف ثابت في JS؟", opts: ["var", "let", "const"], correct: 2, level: "مبتدئ جداً" },
+            { q: "كيف نكتب تعليقاً من سطر واحد؟", opts: ["# comment", "// comment", "/* comment */"], correct: 1, level: "مبتدئ" },
+            { q: "ما هو ناتج 2 + '2'؟", opts: ["4", "22", "NaN"], correct: 1, level: "متوسط" },
+            { q: "أي دالة تستخدم لتحويل نص إلى رقم صحيح؟", opts: ["toString()", "parseInt()", "Math.floor()"], correct: 1, level: "متقدم" },
+            { q: "ما هي مخرجات typeof null؟", opts: ["null", "undefined", "object"], correct: 2, level: "محترف" }
         ];
 
-        // [بيانات الدروس والتحديات كما هي في الكود السابق...]
-        const lessonsData = [{id: 1, title: "المتغيرات", short: "شرح المتغيرات", full: "...", summary: "...", code: "...", output: "..."}, /*... تم الاختصار للمساحة ...*/];
-        const challengesData = [{id: 1, level: "سهل", q: "عرّف متغير ثابت باسم SITE قيمته 'Google'", ans: "const SITE = 'Google';" /*... تم الاختصار ...*/ }];
+        const challengesData = [
+            { id: 1, q: "عرّف متغير ثابت باسم SITE قيمته 'Google'", ans: "const SITE = 'Google';" },
+            { id: 2, q: "ما هو ناتج 5 + '5'؟", ans: "55" },
+            { id: 3, q: "اكتب دالة باسم hi تعيد كلمة 'أهلاً'", ans: "function hi(){return 'أهلاً';}" }
+            // يمكنك إضافة المزيد هنا..
+        ];
 
-        let points = 0, currentAssessIdx = 0, assessScore = 0;
+        let points = 0, currentAssessIdx = 0, assessScore = 0, currentChIdx = 0;
 
-        function navigateTo(v) { document.querySelectorAll('section').forEach(s => s.classList.add('hidden')); document.getElementById('view-' + v).classList.remove('hidden'); }
+        function navigateTo(viewId) {
+            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+            document.getElementById('view-' + viewId).classList.remove('hidden');
+        }
 
+        // Assessment Logic
         function startAssessment() { navigateTo('assessment'); renderAssessQ(); }
-
         function renderAssessQ() {
             const q = assessmentQs[currentAssessIdx];
             document.getElementById('diff-tag').innerText = `صعوبة السؤال: ${q.level}`;
             document.getElementById('assess-q-text').innerText = q.q;
-            document.getElementById('assess-input').value = "";
-            document.getElementById('assess-msg').innerText = "";
+            const container = document.getElementById('assess-options');
+            container.innerHTML = '';
+            q.opts.forEach((opt, i) => {
+                const b = document.createElement('button');
+                b.className = 'lesson-btn';
+                b.innerText = opt;
+                b.onclick = () => {
+                    if(i === q.correct) assessScore++;
+                    currentAssessIdx++;
+                    if(currentAssessIdx < assessmentQs.length) renderAssessQ();
+                    else showWelcome();
+                };
+                container.appendChild(b);
+            });
         }
 
-        function submitAssessment() {
-            const val = document.getElementById('assess-input').value.trim();
-            const msg = document.getElementById('assess-msg');
-            if(!val) { document.getElementById('assess-input').classList.add('error-input'); return; }
-            
-            if(val.toLowerCase() === assessmentQs[currentAssessIdx].ans.toLowerCase()) {
-                assessScore++;
-                msg.innerText = "✅ صحيح!"; msg.style.color = "#4eff4e";
-            } else {
-                msg.innerText = "❌ خطأ! الإجابة هي: " + assessmentQs[currentAssessIdx].ans; msg.style.color = "#ff4d4d";
-            }
-            setTimeout(nextQ, 1500);
+        // Challenge Logic
+        function startChallenges() { navigateTo('challenges'); renderChallengeQ(); }
+        function renderChallengeQ() {
+            const ch = challengesData[currentChIdx];
+            document.getElementById('ch-q-text').innerText = ch.q;
+            document.getElementById('ch-input').value = "";
+            document.getElementById('ch-msg').innerText = "";
         }
 
-        function skipAssessment() { msg.innerText = "تم التخطي"; setTimeout(nextQ, 500); }
+        function checkChallenge() {
+            const input = document.getElementById('ch-input');
+            const msg = document.getElementById('ch-msg');
+            const ch = challengesData[currentChIdx];
 
-        function nextQ() {
-            currentAssessIdx++;
-            if(currentAssessIdx < assessmentQs.length) renderAssessQ();
-            else showWelcome();
-        }
+            if(input.value.trim() === "") return;
 
-        function showWelcome() {
-            let label = assessScore >= 4 ? "محترف" : (assessScore >= 2 ? "متوسط" : "مبتدئ");
-            document.getElementById('level-msg').innerText = `نتيجة الاختبار: ${assessScore}/5. مستواك: ${label}.`;
-            navigateTo('welcome');
-        }
-
-        function renderLessons() {
-            const list = document.getElementById('lessons-list');
-            list.innerHTML = lessonsData.map(l => `
-                <div class="lesson-btn" onclick="viewLessonDetail(${l.id})">
-                    <h3 style="color:var(--primary)">${l.title}</h3>
-                    <p style="font-size:0.9rem; opacity:0.8">${l.short}</p>
-                </div>
-            `).join('');
-        }
-
-        function viewLessonDetail(id) {
-            const l = lessonsData.find(x => x.id === id);
-            document.getElementById('lesson-content').innerHTML = `
-                <h1 style="color:var(--primary); margin-bottom:20px">${l.title}</h1>
-                <p style="font-size:1.1rem; line-height:1.8; margin-bottom:20px">${l.full}</p>
-                <div style="background:rgba(247,223,30,0.1); padding:15px; border-radius:10px; margin-bottom:20px">
-                    <strong style="color:var(--primary)">الاختصار:</strong>
-                    <p>${l.summary}</p>
-                </div>
-                <strong style="display:block; margin-bottom:10px italic">مثال برمجي:</strong>
-                <code>${l.code}</code>
-                <strong>المخرج المتوقع:</strong>
-                <div class="output-box">${l.output}</div>
-            `;
-            navigateTo('lesson-detail');
-        }
-
-        function renderChallenges() {
-            const list = document.getElementById('challenges-list');
-            list.innerHTML = challengesData.map(c => `
-                <div class="quiz-card" style="margin:0; max-width:100%">
-                    <span style="font-size:0.7rem; background:#444; padding:3px 10px; border-radius:5px">${c.level}</span>
-                    <p style="margin:15px 0; font-weight:bold">${c.q}</p>
-                    <input type="text" id="ans-${c.id}" placeholder="اكتب الحل هنا...">
-                    <button class="btn-primary" style="width:100%" onclick="checkAns(${c.id})">إرسال الإجابة</button>
-                    <p id="msg-${c.id}" style="margin-top:10px; font-weight:bold"></p>
-                </div>
-            `).join('');
-        }
-
-        function checkAns(id) {
-            const input = document.getElementById(`ans-${id}`);
-            const msg = document.getElementById(`msg-${id}`);
-            const challenge = challengesData.find(x => x.id === id);
-
-            if(input.value.trim() === "") {
-                input.classList.add('error-input');
-                setTimeout(() => input.classList.remove('error-input'), 500);
-                return;
-            }
-
-            if(input.value.trim().replace(/\s/g, '') === challenge.ans.replace(/\s/g, '')) {
-                input.style.borderColor = "#4eff4e";
-                input.disabled = true;
-                msg.innerHTML = "✅ إجابة مذهلة! +20 نقطة";
-                msg.style.color = "#4eff4e";
+            if(input.value.trim().replace(/\s/g, '') === ch.ans.replace(/\s/g, '')) {
                 points += 20;
                 document.getElementById('pts').innerText = points;
+                msg.innerHTML = "✅ إجابة صحيحة! +20 نقطة";
+                msg.style.color = "#4eff4e";
+                setTimeout(nextChallenge, 1000);
             } else {
                 input.classList.add('error-input');
-                msg.innerHTML = "❌ حاول مجدداً، ركز في الكود!";
+                msg.innerHTML = "❌ خطأ، حاول مجدداً";
                 msg.style.color = "#ff4d4d";
                 setTimeout(() => input.classList.remove('error-input'), 500);
             }
         }
 
-        AOS.init({ duration: 800 });
-        renderLessons();
-        renderChallenges();
-        
+        function nextChallenge() {
+            currentChIdx++;
+            if(currentChIdx < challengesData.length) renderChallengeQ();
+            else { alert("تم إنهاء جميع التحديات!"); navigateTo('welcome'); }
+        }
+
+        function showWelcome() {
+            let levelLabel = assessScore >= 4 ? "محترف (Senior)" : (assessScore >= 2 ? "متوسط (Mid-Level)" : "مبتدئ (Junior)");
+            document.getElementById('level-msg').innerText = `أحسنت! مسارك التعليمي هو: ${levelLabel}.`;
+            navigateTo('welcome');
+        }
+
+        AOS.init();
         document.getElementById('themeToggle').onclick = () => {
             const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', theme);
@@ -291,4 +253,3 @@
     </script>
 </body>
 </html>
-
