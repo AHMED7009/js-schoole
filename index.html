@@ -3,112 +3,307 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JS SCHOOL | التعلم الذكي</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>JS SCHOOL | مدرسة جافاسكربت</title>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { background-color: #121212; color: #e5e7eb; font-family: 'Cairo', sans-serif; }
-        .js-card { background-color: #1e1e20; border: 1px solid #333; transition: 0.3s; }
-        .js-card:hover { border-color: #F7DF1E; }
-        .error-border { border-color: #ef4444 !important; }
+        :root {
+            --primary: #F7DF1E;
+            --bg-dark: #1A1A1B;
+            --bg-light: #F9F9F9;
+            --text-dark: #FFFFFF;
+            --text-light: #2D2D2D;
+            --card-bg: #252526;
+            --transition: all 0.3s ease;
+        }
+
+        [data-theme="light"] {
+            --bg-dark: var(--bg-light);
+            --text-dark: var(--text-light);
+            --card-bg: #FFFFFF;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            transition: var(--transition);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 5%;
+            background: rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo span { color: var(--primary); font-weight: bold; }
+        
+        .points-badge {
+            background: var(--primary);
+            color: #000;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .hero-section { text-align: center; padding: 100px 20px; }
+        .hidden { display: none; }
+
+        .quiz-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 700px;
+            margin: 20px auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 1px solid rgba(247, 223, 30, 0.1);
+        }
+
+        .options-grid { display: grid; gap: 10px; margin-top: 20px; }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(247, 223, 30, 0.4); }
+
+        /* الشروحات والأسئلة الإضافية */
+        .roadmap-container { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; justify-content: center; }
+        
+        .lesson-card { cursor: pointer; transition: var(--transition); }
+        .lesson-card:hover { border-color: var(--primary); }
+
+        .detail-view { max-width: 800px; margin: auto; padding: 20px; line-height: 1.8; }
+        
+        .error-input { border: 2px solid #ff4d4d !important; background: rgba(255, 77, 77, 0.1); }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #111;
+            color: white;
+            box-sizing: border-box;
+        }
+
+        .back-btn { margin-bottom: 20px; display: inline-block; color: var(--primary); cursor: pointer; }
     </style>
 </head>
-<body class="p-4 md:p-10">
+<body>
 
-    <nav class="flex justify-between items-center mb-10 border-b border-gray-800 pb-5">
-        <div class="text-2xl font-black italic">JS <span class="text-[#F7DF1E]">SCHOOL</span></div>
-        <div class="bg-gray-900 px-6 py-2 rounded-full border border-gray-800">
-            النقاط: <span id="user-points" class="font-black text-[#F7DF1E]">0</span>
+    <nav class="navbar">
+        <div class="logo">JS <span>SCHOOL</span></div>
+        <div class="nav-controls">
+            <span class="points-badge">النقاط: <span id="pts">0</span></span>
+            <select id="langSwitcher">
+                <option value="ar">العربية</option>
+                <option value="en">English</option>
+            </select>
+            <button id="themeToggle">🌙</button>
         </div>
     </nav>
 
-    <main id="main-content" class="max-w-4xl mx-auto">
-        <div id="view-dashboard" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <button onclick="showLibrary()" class="js-card p-10 rounded-3xl text-right hover:scale-105">
-                <i class="fas fa-book-open text-4xl text-[#F7DF1E] mb-4"></i>
-                <h3 class="text-2xl font-bold">المكتبة المعرفية</h3>
-                <p class="text-gray-400">شروحات مفصلة لكل أساسيات اللغة.</p>
-            </button>
-            <button onclick="showChallenges()" class="js-card p-10 rounded-3xl text-right hover:scale-105">
-                <i class="fas fa-vial text-4xl text-green-500 mb-4"></i>
-                <h3 class="text-2xl font-bold">مركز الاختبارات</h3>
-                <p class="text-gray-400">اختبر مهاراتك واحصل على نقاط.</p>
-            </button>
-        </div>
+    <main id="app-container">
+        <section id="hero" class="hero-section" data-aos="fade-up">
+            <h1 class="t-title">ابدأ رحلتك في جافاسكربت</h1>
+            <p class="t-subtitle">منصة ذكية تخصص لك المسار بناءً على مستواك الحقيقي.</p>
+            <button onclick="startAssessment()" class="btn-primary t-start-btn">ابدأ اختبار تحديد المستوى</button>
+        </section>
 
-        <div id="dynamic-content" class="mt-10"></div>
+        <section id="assessment-view" class="hidden">
+            <div class="quiz-card" data-aos="zoom-in">
+                <h3 id="question-text">السؤال يظهر هنا...</h3>
+                <div id="options-container" class="options-grid"></div>
+            </div>
+        </section>
+
+        <section id="dashboard-view" class="hidden">
+            <center>
+                <h2 class="t-welcome">مرحباً بك! مستواك: <span id="user-level-tag" style="color:var(--primary)">---</span></h2>
+                <div style="margin-bottom: 30px;">
+                    <button class="btn-primary" onclick="showTab('lessons')">المكتبة المعرفة</button>
+                    <button class="btn-primary" onclick="showTab('challenges')">مركز التحديات</button>
+                </div>
+            </center>
+
+            <div id="lessons-tab" class="roadmap-container"></div>
+
+            <div id="challenges-tab" class="roadmap-container hidden"></div>
+
+            <div id="detail-view" class="detail-view hidden"></div>
+        </section>
     </main>
 
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        let points = 0;
-
-        const lessons = [
-            { id: 1, title: "المتغيرات", content: "تستخدم 'let' للمتغيرات القابلة للتغيير، و 'const' للقيم الثابتة التي لا تتغير. مثال: const PI = 3.14;" },
-            { id: 2, title: "الدوال", content: "الدالة هي كتلة برمجية. تعريفها: function myFunc() { // كود هنا }." },
-            { id: 3, title: "المصفوفات", content: "المصفوفة هي قائمة قيم: const arr = [1, 2, 3];. تبدأ دائماً بالفهرس 0." },
-            { id: 4, title: "الكائنات", content: "الكائن يربط مفاتيح بقيم: const user = {name: 'Ali'};." }
+        // 1. قاعدة البيانات (شروحات مفصلة وتحديات)
+        const assessmentQuestions = [
+            { q: "ما هي طريقة تعريف متغير لا يمكن تغييره؟", options: ["var", "let", "const"], correct: 2 },
+            { q: "ما هي نتيجة typeof []؟", options: ["object", "array", "null"], correct: 0 }
         ];
 
-        const challenges = [
-            { id: 1, title: "تحدي المتغيرات", question: "عرّف متغير ثابت باسم PI يساوي 3.14", answer: "const PI = 3.14;" },
-            { id: 2, title: "تحدي الطباعة", question: "ما هو الأمر لطباعة 'Hello' في الـ Console؟", answer: "console.log('Hello');" }
+        const libraryData = [
+            { 
+                id: 1, 
+                title: "المتغيرات (Variables)", 
+                short: "شرح const و let و var بالتفصيل.",
+                full: "المتغيرات هي حاويات لتخزين البيانات. في جافاسكربت الحديثة نستخدم:<br><b>1. const:</b> للقيم الثابتة التي لا تتغير.<br><b>2. let:</b> للقيم التي قد تتغير لاحقاً.<br><b>3. var:</b> الطريقة القديمة (لا ينصح بها حالياً)."
+            },
+            { 
+                id: 2, 
+                title: "الدوال (Functions)", 
+                short: "كيفية بناء الأكواد المتكررة.",
+                full: "الدالة هي مجموعة من الأوامر التي تنفذ مهمة معينة. تساعدنا الدوال في كتابة الكود مرة واحدة واستخدامه عدة مرات.<br>مثال:<br><code>function sayHi() { console.log('Hi'); }</code>"
+            }
         ];
 
-        function showLibrary() {
-            document.getElementById('view-dashboard').classList.add('hidden');
-            document.getElementById('dynamic-content').innerHTML = `
-                <button onclick="goBack()" class="mb-6 text-gray-400"><i class="fas fa-arrow-right"></i> عودة</button>
-                <div class="grid gap-4">
-                    ${lessons.map(l => `<div class="js-card p-6 rounded-2xl cursor-pointer" onclick="viewLesson(${l.id})">${l.title}</div>`).join('')}
-                </div>`;
+        const challengesData = [
+            { id: 1, q: "اكتب كود لتعريف متغير ثابت باسم PI وقيمته 3.14", correct: "const PI = 3.14;" },
+            { id: 2, q: "كيف نطبع كلمة 'Hello' في الكونسول؟", correct: "console.log('Hello');" }
+        ];
+
+        let score = 0;
+        let currentStep = 0;
+        let userPoints = 0;
+
+        // 2. إدارة الواجهة
+        function startAssessment() {
+            document.getElementById('hero').classList.add('hidden');
+            document.getElementById('assessment-view').classList.remove('hidden');
+            showAssessmentQuestion();
         }
 
-        function viewLesson(id) {
-            const lesson = lessons.find(l => l.id === id);
-            document.getElementById('dynamic-content').innerHTML = `
-                <button onclick="showLibrary()" class="mb-6 text-gray-400"><i class="fas fa-arrow-left"></i> قائمة الدروس</button>
-                <div class="js-card p-10 rounded-3xl border-r-8 border-[#F7DF1E]">
-                    <h2 class="text-3xl font-black mb-6">${lesson.title}</h2>
-                    <p class="text-lg text-gray-300 leading-loose">${lesson.content}</p>
-                </div>`;
+        function showAssessmentQuestion() {
+            const q = assessmentQuestions[currentStep];
+            document.getElementById('question-text').innerText = q.q;
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-primary';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    if (index === q.correct) score++;
+                    currentStep++;
+                    if (currentStep < assessmentQuestions.length) showAssessmentQuestion();
+                    else finalizeAssessment();
+                };
+                container.appendChild(btn);
+            });
         }
 
-        function showChallenges() {
-            document.getElementById('view-dashboard').classList.add('hidden');
-            document.getElementById('dynamic-content').innerHTML = `
-                <button onclick="goBack()" class="mb-6 text-gray-400"><i class="fas fa-arrow-right"></i> عودة</button>
-                ${challenges.map(c => `
-                    <div class="js-card p-8 rounded-3xl mb-6">
-                        <p class="mb-4 text-xl">${c.question}</p>
-                        <input type="text" id="ans-${c.id}" class="w-full bg-black border border-gray-700 p-4 rounded-xl mb-4" placeholder="اكتب الحل هنا...">
-                        <button onclick="checkResult(${c.id}, '${c.answer}')" class="w-full py-4 bg-green-600 rounded-xl font-bold">إرسال الإجابة</button>
-                    </div>
-                `).join('')}`;
+        function finalizeAssessment() {
+            const level = score >= 2 ? 'Advanced' : 'Beginner';
+            document.getElementById('assessment-view').classList.add('hidden');
+            document.getElementById('dashboard-view').classList.remove('hidden');
+            document.getElementById('user-level-tag').innerText = level;
+            renderLessons();
+            renderChallenges();
         }
 
-        function checkResult(id, correctAnswer) {
+        // 3. نظام الشروحات (المكتبة)
+        function renderLessons() {
+            const container = document.getElementById('lessons-tab');
+            container.innerHTML = libraryData.map(lesson => `
+                <div class="quiz-card lesson-card" onclick="viewDetail(${lesson.id})">
+                    <h4>${lesson.title}</h4>
+                    <p>${lesson.short}</p>
+                    <small style="color:var(--primary)">اضغط للتفاصيل المملة...</small>
+                </div>
+            `).join('');
+        }
+
+        function viewDetail(id) {
+            const lesson = libraryData.find(l => l.id === id);
+            const detailView = document.getElementById('detail-view');
+            document.getElementById('lessons-tab').classList.add('hidden');
+            document.getElementById('challenges-tab').classList.add('hidden');
+            
+            detailView.innerHTML = `
+                <span class="back-btn" onclick="showTab('lessons')">← العودة للقائمة</span>
+                <h2>${lesson.title}</h2>
+                <div class="quiz-card">${lesson.full}</div>
+            `;
+            detailView.classList.remove('hidden');
+        }
+
+        // 4. نظام التحديات (مع التحقق)
+        function renderChallenges() {
+            const container = document.getElementById('challenges-tab');
+            container.innerHTML = challengesData.map(c => `
+                <div class="quiz-card">
+                    <h4>تحدي جديد</h4>
+                    <p>${c.q}</p>
+                    <input type="text" id="ans-${c.id}" placeholder="اكتب الحل هنا...">
+                    <button class="btn-primary" onclick="checkChallenge(${c.id})">إرسال الإجابة</button>
+                    <p id="msg-${c.id}" style="margin-top:10px"></p>
+                </div>
+            `).join('');
+        }
+
+        function checkChallenge(id) {
             const input = document.getElementById(`ans-${id}`);
+            const msg = document.getElementById(`msg-${id}`);
+            const challenge = challengesData.find(c => c.id === id);
+
             if (input.value.trim() === "") {
-                input.classList.add('error-border');
+                input.classList.add('error-input');
+                msg.innerText = "لا يمكن ترك الحقل فارغاً!";
+                msg.style.color = "#ff4d4d";
                 return;
             }
-            
-            if (input.value.trim() === correctAnswer) {
-                input.classList.remove('error-border');
+
+            if (input.value.trim() === challenge.correct) {
+                input.classList.remove('error-input');
+                input.style.borderColor = "#4eff4e";
                 input.disabled = true;
-                input.className = "w-full bg-green-900/20 border border-green-500 p-4 rounded-xl mb-4";
-                points += 20;
-                document.getElementById('user-points').innerText = points;
-                alert("إجابة صحيحة! +20 نقطة");
+                msg.innerText = "إجابة صحيحة! +20 نقطة";
+                msg.style.color = "#4eff4e";
+                userPoints += 20;
+                document.getElementById('pts').innerText = userPoints;
             } else {
-                alert("إجابة خاطئة، حاول مجدداً!");
+                input.classList.add('error-input');
+                msg.innerText = "إجابة خاطئة، حاول مرة أخرى.";
+                msg.style.color = "#ff4d4d";
             }
         }
 
-        function goBack() {
-            document.getElementById('view-dashboard').classList.remove('hidden');
-            document.getElementById('dynamic-content').innerHTML = "";
+        function showTab(tab) {
+            document.getElementById('detail-view').classList.add('hidden');
+            if (tab === 'lessons') {
+                document.getElementById('lessons-tab').classList.remove('hidden');
+                document.getElementById('challenges-tab').classList.add('hidden');
+            } else {
+                document.getElementById('lessons-tab').classList.add('hidden');
+                document.getElementById('challenges-tab').classList.remove('hidden');
+            }
         }
+
+        // Theme Toggle
+        document.getElementById('themeToggle').onclick = () => {
+            const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        };
+
+        AOS.init({ duration: 800 });
     </script>
 </body>
 </html>
