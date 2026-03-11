@@ -3,262 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JS SCHOOL | تعلم جافاسكربت بذكاء</title>
+    <title>JS SCHOOL | التعلم الذكي</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
-        :root {
-            --js-yellow: #F7DF1E;
-            --soft-charcoal: #1e1e20;
-            --deep-black: #121212;
-            --transition: all 0.3s ease;
-        }
-
-        body {
-            font-family: 'Cairo', sans-serif;
-            background-color: var(--deep-black);
-            color: white;
-            scroll-behavior: smooth;
-        }
-
-        .js-card {
-            background-color: var(--soft-charcoal);
-            transition: var(--transition);
-        }
-
-        .js-card:hover { transform: translateY(-5px); }
-
-        .hidden-section { display: none; opacity: 0; }
-        .active-section { display: block; animation: fadeIn 0.5s forwards; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .tab-btn.active {
-            border-bottom: 4px solid var(--js-yellow);
-            color: var(--js-yellow);
-        }
-
-        #code-editor {
-            font-family: 'Fira Code', monospace;
-            background: #2d2d2d;
-            color: #f8f8f2;
-        }
+        body { background-color: #0f0f10; color: white; font-family: 'Cairo', sans-serif; }
+        .js-card { background-color: #1e1e20; border: 1px solid rgba(247, 223, 30, 0.1); }
+        .error-border { border-color: #ef4444 !important; background-color: rgba(239, 68, 68, 0.05); }
     </style>
 </head>
-<body class="pb-10">
+<body class="pb-20">
 
-    <nav class="fixed top-0 w-full z-50 bg-[#1e1e20]/80 backdrop-blur-md px-6 py-4 flex justify-between items-center border-b border-white/5">
-        <div class="text-2xl font-black flex items-center gap-2">
-            <div class="bg-[#F7DF1E] text-black px-2 py-0.5 rounded text-xl">JS</div>
-            <span class="tracking-tighter">SCHOOL</span>
-        </div>
-        
-        <div class="flex items-center gap-4">
-            <div class="bg-black/40 px-4 py-1 rounded-full border border-white/10 flex items-center gap-2">
-                <i class="fas fa-coins text-[#F7DF1E]"></i>
-                <span id="global-points" class="font-bold">0</span>
-            </div>
-            <select id="lang-select" class="bg-transparent text-sm outline-none cursor-pointer">
-                <option value="ar">العربية</option>
-                <option value="en">English</option>
-            </select>
+    <nav class="fixed top-0 w-full z-50 bg-[#1e1e20]/90 backdrop-blur-md px-6 py-4 flex justify-between items-center border-b border-white/5">
+        <div class="text-2xl font-black">JS <span class="text-[#F7DF1E]">SCHOOL</span></div>
+        <div class="bg-black/40 px-4 py-1.5 rounded-full border border-white/10">
+            النقاط: <span id="user-points" class="font-bold text-[#F7DF1E]">0</span>
         </div>
     </nav>
 
-    <main class="mt-28 px-4 max-w-6xl mx-auto">
-        
-        <section id="hero-section" class="active-section text-center py-10">
-            <h1 class="text-4xl md:text-6xl font-black mb-6 italic">طريقك نحو الإتقان يبدأ هنا</h1>
-            <p class="text-gray-400 text-lg mb-10 max-w-2xl mx-auto">نحن لا نعلمك فقط، بل نخصص لك مساراً برمجياً يناسب ذكاءك وقدراتك الحالية.</p>
-            <button onclick="startAssessment()" class="bg-[#F7DF1E] text-black px-10 py-4 rounded-2xl font-bold text-xl hover:scale-105 transition-transform shadow-[0_0_20px_rgba(247,223,30,0.3)]">
-                ابدأ اختبار تحديد المستوى <i class="fas fa-bolt mr-2"></i>
+    <main class="mt-28 px-4 max-w-5xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <button onclick="showLibrary()" class="js-card p-10 rounded-3xl text-right hover:border-[#F7DF1E] transition-all">
+                <i class="fas fa-book-open text-4xl text-[#F7DF1E] mb-4"></i>
+                <h3 class="text-2xl font-bold">المكتبة المعرفية</h3>
+                <p class="text-gray-400">شروحات مفصلة حول اللغة.</p>
             </button>
-        </section>
+            <button onclick="showChallenges()" class="js-card p-10 rounded-3xl text-right hover:border-green-500 transition-all">
+                <i class="fas fa-vial text-4xl text-green-500 mb-4"></i>
+                <h3 class="text-2xl font-bold">مركز التحديات</h3>
+                <p class="text-gray-400">اختبر معلوماتك واكسب نقاط.</p>
+            </button>
+        </div>
 
-        <section id="quiz-section" class="hidden-section">
-            <div class="max-w-2xl mx-auto js-card p-8 rounded-3xl border border-white/5">
-                <div class="flex justify-between mb-6">
-                    <span id="q-progress" class="text-[#F7DF1E] font-mono">1/5</span>
-                    <span id="q-difficulty" class="text-xs bg-white/10 px-3 py-1 rounded-full uppercase">سهل جداً</span>
-                </div>
-                <h2 id="q-text" class="text-2xl font-bold mb-8 leading-relaxed">السؤال يظهر هنا...</h2>
-                <div id="q-options" class="grid gap-3"></div>
+        <div id="content-area">
             </div>
-        </section>
-
-        <section id="dashboard-section" class="hidden-section">
-            <div class="mb-10">
-                <h2 class="text-3xl font-black">لوحة التحكم الذكية</h2>
-                <p class="text-gray-400">مستواك الحالي: <span id="user-level" class="text-[#F7DF1E] font-bold">---</span></p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-                <button onclick="switchTab('theory')" id="btn-theory" class="js-card p-10 rounded-3xl text-right border-b-4 border-[#F7DF1E] hover:bg-white/5 transition-colors group">
-                    <i class="fas fa-book-open text-4xl text-[#F7DF1E] mb-4 block group-hover:rotate-12 transition-transform"></i>
-                    <h3 class="text-2xl font-bold">المكتبة المعرفية</h3>
-                    <p class="text-gray-400 mt-2">شروحات مكتوبة، مفاهيم، وأمثلة تطبيقية.</p>
-                </button>
-                <button onclick="switchTab('practice')" id="btn-practice" class="js-card p-10 rounded-3xl text-right border-b-4 border-green-500 hover:bg-white/5 transition-colors group">
-                    <i class="fas fa-vial text-4xl text-green-500 mb-4 block group-hover:rotate-12 transition-transform"></i>
-                    <h3 class="text-2xl font-bold">مركز التحديات</h3>
-                    <p class="text-gray-400 mt-2">اختبارات قصيرة، كتابة أكواد، وجوائز نقاط.</p>
-                </button>
-            </div>
-
-            <div id="theory-content" class="tab-pane">
-                <div class="relative mb-8">
-                    <i class="fas fa-search absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
-                    <input type="text" id="lesson-search" onkeyup="filterLessons()" placeholder="ابحث عن درس (مثلاً: المتغيرات، المصفوفات)..." 
-                           class="w-full bg-[#1e1e20] border border-white/10 rounded-2xl py-4 pr-12 pl-4 outline-none focus:border-[#F7DF1E]">
-                </div>
-                <div id="lessons-grid" class="grid gap-4"></div>
-            </div>
-
-            <div id="practice-content" class="tab-pane hidden">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="challenges-grid"></div>
-            </div>
-        </section>
-
     </main>
 
     <script>
-        // --- البيانات ---
-        const assessmentQuestions = [
-            { q: "أي مما يلي يستخدم لتعريف متغير ثابت؟", options: ["var", "let", "const", "set"], correct: 2, diff: "سهل جداً" },
-            { q: "ما هي نتيجة 2 + '2' في جافاسكربت؟", options: ["4", "'22'", "NaN", "Error"], correct: 1, diff: "سهل" },
-            { q: "أي دالة تستخدم لتحويل النص إلى مصفوفة؟", options: ["join()", "slice()", "split()", "push()"], correct: 2, diff: "متوسط" },
-            { q: "ما هو الـ Closure؟", options: ["دالة داخل دالة", "نظام تشفير", "نوع من المصفوفات", "خطأ برمجلي"], correct: 0, diff: "صعب" },
-            { q: "ما هي مخرجات console.log(typeof NaN)؟", options: ["NaN", "number", "undefined", "object"], correct: 1, diff: "صعب جداً" }
-        ];
-
-        const lessonsData = [
-            { id: 1, title: "مقدمة في المتغيرات", content: "المتغيرات هي حاويات لتخزين البيانات. في JS الحديثة نستخدم let للمتغيرات التي تتغير قيمتها، و const للثوابت.", tags: "متغيرات variables let const" },
-            { id: 2, title: "التعامل مع المصفوفات (Arrays)", content: "المصفوفات تتيح تخزين عدة قيم في متغير واحد. يمكنك الوصول للعناصر باستخدام الفهرس (Index) الذي يبدأ من 0.", tags: "مصفوفات arrays list" },
-            { id: 3, title: "الدوال (Functions)", content: "الدالة هي مجموعة من الأوامر التي تنفذ مهمة محددة. يمكن تعريفها باستخدام كلمة function أو Arrow Function (=>).", tags: "دوال functions" },
-            { id: 4, title: "الكائنات (Objects)", content: "الكائنات تسمح لك بتخزين البيانات على شكل مفتاح وقيمة (Key-Value)، وهي أساس تنظيم البيانات المعقدة.", tags: "كائنات objects json" }
-        ];
-
-        const challengesData = [
-            { id: 1, title: "تحدي تعريف المتغيرات", question: "اكتب الكود لتعريف متغير ثابت باسم 'SPEED' وقيمته 100.", type: "كتابة كود", points: 20 },
-            { id: 2, title: "اختبار منطق المصفوفات", question: "كيف نحصل على طول مصفوفة اسمها 'items'؟", type: "سؤال مباشر", points: 20 },
-            { id: 3, title: "تحدي العمليات الحسابية", question: "ما هو ناتج (10 % 3)؟", type: "سؤال مباشر", points: 20 }
-        ];
-
         let points = 0;
-        let currentQ = 0;
-        let userLevelScore = 0;
 
-        // --- وظائف التبديل والتحكم ---
-        function startAssessment() {
-            switchSection('hero-section', 'quiz-section');
-            showAssessmentQuestion();
+        const lessons = [
+            { id: 1, title: "المتغيرات (Variables)", content: "المتغيرات هي حاويات لتخزين المعلومات. نستخدم 'let' للقيم المتغيرة و 'const' للقيم الثابتة. مثال: const x = 10;." },
+            { id: 2, title: "الدوال (Functions)", content: "الدالة هي مجموعة تعليمات برمجية. نستخدمها لتنفيذ مهام متكررة. تعريف الدالة يبدأ بكلمة 'function' ثم اسم الدالة." }
+        ];
+
+        const challenges = [
+            { id: 1, title: "تحدي المتغير الثابت", question: "عرّف متغير ثابت باسم PI يساوي 3.14." },
+            { id: 2, title: "تحدي الطباعة", question: "ما هو الأمر لطباعة جملة في وحدة التحكم (Console)؟" }
+        ];
+
+        // عرض المكتبة
+        function showLibrary() {
+            const area = document.getElementById('content-area');
+            area.innerHTML = `<h2 class="text-3xl font-bold mb-6">قائمة الدروس</h2>` + 
+                lessons.map(l => `<div class="js-card p-6 mb-4 rounded-xl cursor-pointer hover:bg-white/5" onclick="viewLesson(${l.id})">${l.title}</div>`).join('');
         }
 
-        function showAssessmentQuestion() {
-            const q = assessmentQuestions[currentQ];
-            document.getElementById('q-progress').innerText = `${currentQ + 1}/5`;
-            document.getElementById('q-difficulty').innerText = q.diff;
-            document.getElementById('q-text').innerText = q.q;
-            
-            const optionsDiv = document.getElementById('q-options');
-            optionsDiv.innerHTML = '';
-            q.options.forEach((opt, idx) => {
-                const btn = document.createElement('button');
-                btn.className = "w-full p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-[#F7DF1E] text-right transition-all";
-                btn.innerText = opt;
-                btn.onclick = () => handleAssessmentAnswer(idx);
-                optionsDiv.appendChild(btn);
-            });
-        }
-
-        function handleAssessmentAnswer(idx) {
-            if (idx === assessmentQuestions[currentQ].correct) userLevelScore++;
-            currentQ++;
-            if (currentQ < 5) {
-                showAssessmentQuestion();
-            } else {
-                finishAssessment();
-            }
-        }
-
-        function finishAssessment() {
-            let level = "مبتدئ";
-            if (userLevelScore >= 4) level = "متقدم";
-            else if (userLevelScore >= 2) level = "متوسط";
-            
-            document.getElementById('user-level').innerText = level;
-            switchSection('quiz-section', 'dashboard-section');
-            renderLessons();
-            renderChallenges();
-        }
-
-        function switchSection(oldId, newId) {
-            document.getElementById(oldId).classList.add('hidden-section');
-            document.getElementById(oldId).classList.remove('active-section');
-            document.getElementById(newId).classList.remove('hidden-section');
-            document.getElementById(newId).classList.add('active-section');
-        }
-
-        function switchTab(tab) {
-            if (tab === 'theory') {
-                document.getElementById('theory-content').classList.remove('hidden');
-                document.getElementById('practice-content').classList.add('hidden');
-            } else {
-                document.getElementById('theory-content').classList.add('hidden');
-                document.getElementById('practice-content').classList.remove('hidden');
-            }
-        }
-
-        // --- نظام الشروحات والبحث ---
-        function renderLessons(data = lessonsData) {
-            const grid = document.getElementById('lessons-grid');
-            grid.innerHTML = data.map(l => `
-                <div class="js-card p-6 rounded-2xl border border-white/5 group">
-                    <h4 class="text-xl font-bold mb-3 text-[#F7DF1E]">${l.title}</h4>
-                    <p class="text-gray-400 leading-relaxed">${l.content}</p>
+        // عرض تفاصيل الدرس
+        function viewLesson(id) {
+            const lesson = lessons.find(l => l.id === id);
+            document.getElementById('content-area').innerHTML = `
+                <button onclick="showLibrary()" class="mb-4 text-gray-400"><i class="fas fa-arrow-right"></i> عودة</button>
+                <div class="js-card p-10 rounded-3xl">
+                    <h2 class="text-4xl font-bold text-[#F7DF1E] mb-6">${lesson.title}</h2>
+                    <p class="text-lg leading-loose">${lesson.content}</p>
                 </div>
-            `).join('');
+            `;
         }
 
-        function filterLessons() {
-            const term = document.getElementById('lesson-search').value.toLowerCase();
-            const filtered = lessonsData.filter(l => l.tags.toLowerCase().includes(term) || l.title.toLowerCase().includes(term));
-            renderLessons(filtered);
+        // عرض التحديات
+        function showChallenges() {
+            const area = document.getElementById('content-area');
+            area.innerHTML = `<h2 class="text-3xl font-bold mb-6">مركز التحديات</h2>` +
+                challenges.map(c => `
+                    <div class="js-card p-6 mb-6 rounded-2xl">
+                        <p class="mb-4">${c.question}</p>
+                        <input type="text" id="ans-${c.id}" class="w-full bg-black/30 border border-white/10 p-4 rounded-xl mb-3 outline-none" placeholder="اكتب الإجابة هنا...">
+                        <button onclick="submitAnswer(${c.id})" class="w-full py-3 bg-green-600 rounded-xl font-bold">إرسال الإجابة</button>
+                    </div>
+                `).join('');
         }
 
-        // --- نظام الاختبارات والنقاط ---
-        function renderChallenges() {
-            const grid = document.getElementById('challenges-grid');
-            grid.innerHTML = challengesData.map(c => `
-                <div class="js-card p-6 rounded-2xl border border-white/5 relative overflow-hidden">
-                    <div class="absolute top-0 left-0 bg-green-500 text-black text-[10px] px-3 py-1 font-bold">+${c.points} نقطة</div>
-                    <h4 class="text-lg font-bold mt-4 mb-2">${c.title}</h4>
-                    <p class="text-sm text-gray-500 mb-6 italic">${c.question}</p>
-                    <button onclick="solveChallenge(this, ${c.points})" class="w-full py-3 bg-white/5 hover:bg-green-500 hover:text-black rounded-xl font-bold transition-all border border-white/10">
-                        إرسال الإجابة
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        function solveChallenge(btn, p) {
-            if (btn.disabled) return;
-            points += p;
-            document.getElementById('global-points').innerText = points;
-            
-            btn.innerHTML = "<i class='fas fa-check ml-2'></i> تمت بنجاح";
-            btn.className = "w-full py-3 bg-green-500 text-black rounded-xl font-bold cursor-default";
-            btn.disabled = true;
-
-            // انيميشن بسيط للنقاط
-            const ptsDisplay = document.getElementById('global-points');
-            ptsDisplay.style.transform = "scale(1.5)";
-            setTimeout(() => ptsDisplay.style.transform = "scale(1)", 300);
+        // التحقق من الإجابة
+        function submitAnswer(id) {
+            const input = document.getElementById(`ans-${id}`);
+            if (input.value.trim() === "") {
+                input.classList.add('error-border');
+                return;
+            }
+            input.classList.remove('error-border');
+            input.disabled = true;
+            points += 20;
+            document.getElementById('user-points').innerText = points;
+            alert("إجابة صحيحة! +20 نقطة");
         }
     </script>
 </body>
