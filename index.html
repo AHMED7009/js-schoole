@@ -1,613 +1,366 @@
 <!DOCTYPE html>
-
 <html lang="ar" dir="rtl" data-theme="dark">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>JS SCHOOL | مدرسة جافاسكربت المتكاملة</title>
-
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     
-
     <style>
-
         :root {
-
             --primary: #F7DF1E;
-
             --bg-dark: #1A1A1B;
-
             --bg-light: #F9F9F9;
-
             --text-dark: #FFFFFF;
-
             --card-bg: #252526;
-
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
         }
-
-
 
         [data-theme="light"] {
-
             --bg-dark: #f0f2f5;
-
             --text-dark: #1a1a1a;
-
             --card-bg: #ffffff;
-
         }
-
-
 
         body {
-
             background-color: var(--bg-dark);
-
             color: var(--text-dark);
-
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-
             margin: 0;
-
             transition: var(--transition);
-
             overflow-x: hidden;
-
         }
-
-
 
         .navbar {
-
             display: flex; justify-content: space-between; align-items: center;
-
             padding: 1rem 5%; background: rgba(0,0,0,0.2);
-
             backdrop-filter: blur(15px); position: sticky; top: 0; z-index: 1000;
-
             border-bottom: 1px solid rgba(255,255,255,0.05);
-
         }
-
-
 
         .logo { font-size: 1.5rem; font-weight: 900; }
-
         .logo span { color: var(--primary); }
-
         
-
         .points-badge {
-
             background: var(--primary); color: #000;
-
             padding: 6px 18px; border-radius: 50px; font-weight: 800;
-
             box-shadow: 0 4px 15px rgba(247, 223, 30, 0.3);
-
         }
-
-
 
         .hidden { display: none !important; }
-
         .btn-primary {
-
             background: var(--primary); color: #000; border: none;
-
             padding: 14px 30px; border-radius: 12px; cursor: pointer;
-
             font-weight: 700; transition: var(--transition);
-
             box-shadow: 0 4px 15px rgba(247, 223, 30, 0.2);
-
         }
-
         .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(247, 223, 30, 0.4); }
 
-
-
         .quiz-card {
-
             background: var(--card-bg); padding: 2.5rem; border-radius: 20px;
-
             max-width: 800px; margin: 30px auto;
-
             border: 1px solid rgba(255,255,255,0.05);
-
             box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-
         }
-
-
 
         .hero-section { text-align: center; padding: 120px 20px; }
-
         .welcome-msg { color: var(--primary); font-size: 2.5rem; font-weight: 900; margin-bottom: 10px; }
 
-
-
         .lessons-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 20px; }
-
         .lesson-btn {
-
             background: var(--card-bg); border: 1px solid #444; color: var(--text-dark);
-
             padding: 25px; border-radius: 15px; cursor: pointer; text-align: right;
-
             transition: var(--transition); position: relative; overflow: hidden;
-
         }
-
         .lesson-btn:hover { border-color: var(--primary); transform: scale(1.03); }
-
         .lesson-btn::after { content: '←'; position: absolute; left: 20px; top: 40%; font-size: 1.5rem; color: var(--primary); opacity: 0; transition: 0.3s; }
-
         .lesson-btn:hover::after { opacity: 1; left: 30px; }
 
-
-
         code { background: #000; color: #4eff4e; padding: 15px; display: block; border-radius: 8px; font-family: 'Courier New', Courier, monospace; margin: 15px 0; direction: ltr; text-align: left; }
-
         .output-box { background: #333; color: #fff; padding: 10px 15px; border-left: 4px solid var(--primary); margin-bottom: 20px; font-size: 0.9rem; }
 
-
-
         .error-input { border: 2px solid #ff4d4d !important; animation: shake 0.4s; }
-
         @keyframes shake {
-
             0%, 100% { transform: translateX(0); }
-
             25% { transform: translateX(-5px); }
-
             75% { transform: translateX(5px); }
-
         }
-
-
 
         input[type="text"] {
-
             width: 100%; padding: 15px; background: #111; border: 1px solid #444;
-
             color: #fff; border-radius: 10px; margin: 10px 0; outline: none;
-
         }
-
     </style>
-
 </head>
-
 <body>
 
-
-
     <nav class="navbar">
-
         <div class="logo">JS <span>SCHOOL</span></div>
-
         <div class="nav-controls">
-
             <span class="points-badge"><i class="fas fa-star"></i> <span id="pts">0</span></span>
-
             <button id="themeToggle" style="background:none; border:none; color:white; font-size:1.2rem; cursor:pointer; margin-right:15px">🌙</button>
-
         </div>
-
     </nav>
 
-
-
     <main id="app-container">
-
         <section id="view-hero" class="hero-section" data-aos="fade-down">
-
             <h1>أهلاً بك في مستقبل البرمجة</h1>
-
             <p>منصة تعليمية ذكية تحلل مستواك وتأخذ بيدك للاحتراف.</p>
-
             <button onclick="startAssessment()" class="btn-primary">ابدأ اختبار تحديد المستوى</button>
-
         </section>
-
-
 
         <section id="view-assessment" class="hidden">
-
             <div class="quiz-card" data-aos="zoom-in">
-
                 <div id="diff-tag" style="font-size: 0.7rem; color: var(--primary); letter-spacing: 2px; margin-bottom: 10px;">LEVEL 1</div>
-
                 <h2 id="assess-q-text" style="margin-bottom:30px">السؤال...</h2>
-
                 <div id="assess-options" class="lessons-grid" style="grid-template-columns: 1fr;"></div>
-
             </div>
-
         </section>
-
-
 
         <section id="view-welcome" class="hidden hero-section">
-
             <div data-aos="fade-up">
-
                 <h1 class="welcome-msg">مرحباً بك أيها المبرمج الطموح! 🚀</h1>
-
                 <p id="level-msg" style="font-size:1.2rem; margin-bottom:40px"></p>
-
                 <div class="lessons-grid" style="max-width:800px; margin:auto">
-
                     <button class="btn-primary" onclick="navigateTo('lessons')"><i class="fas fa-book"></i> استكشاف المكتبة المعرفية</button>
-
-                    <button class="btn-primary" onclick="navigateTo('challenges')"><i class="fas fa-code"></i> دخول مركز التحديات</button>
-
+                    <button class="btn-primary" onclick="startChallengeSequence()"><i class="fas fa-code"></i> دخول مركز التحديات</button>
                 </div>
-
             </div>
-
         </section>
-
-
 
         <section id="view-lessons" class="hidden">
-
             <div style="padding:40px 5%">
-
                 <button onclick="navigateTo('welcome')" style="color:var(--primary); background:none; border:none; cursor:pointer; font-weight:bold; margin-bottom:20px">← العودة للرئيسية</button>
-
                 <h1 style="margin-bottom:30px">المكتبة المعرفية 📚</h1>
-
                 <div id="lessons-list" class="lessons-grid"></div>
-
             </div>
-
         </section>
-
-
 
         <section id="view-lesson-detail" class="hidden">
-
             <div class="quiz-card" style="max-width:900px">
-
                 <button onclick="navigateTo('lessons')" style="color:var(--primary); background:none; border:none; cursor:pointer; font-weight:bold; margin-bottom:20px">← العودة للقائمة</button>
-
                 <div id="lesson-content"></div>
-
             </div>
-
         </section>
-
-
 
         <section id="view-challenges" class="hidden">
-
             <div style="padding:40px 5%">
-
                 <button onclick="navigateTo('welcome')" style="color:var(--primary); background:none; border:none; cursor:pointer; font-weight:bold; margin-bottom:20px">← العودة للرئيسية</button>
-
                 <h1 style="margin-bottom:30px">مركز التحديات والمهارات 🏆</h1>
-
-                <div id="challenges-list" class="lessons-grid"></div>
-
+                <div id="challenge-box-container">
+                    </div>
             </div>
-
         </section>
-
     </main>
 
-
-
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-
     <script>
-
         // --- 5 تساؤلات متدرجة الصعوبة لتقييم المستوى ---
-
         const assessmentQs = [
-
             { q: "ما هي الطريقة الصحيحة لتعريف ثابت في JS؟", opts: ["var", "let", "const"], correct: 2, level: "مبتدئ جداً" },
-
             { q: "كيف نكتب تعليقاً من سطر واحد؟", opts: ["# comment", "// comment", "/* comment */"], correct: 1, level: "مبتدئ" },
-
             { q: "ما هو ناتج 2 + '2'؟", opts: ["4", "22", "NaN"], correct: 1, level: "متوسط" },
-
             { q: "أي دالة تستخدم لتحويل نص إلى رقم صحيح؟", opts: ["toString()", "parseInt()", "Math.floor()"], correct: 1, level: "متقدم" },
-
             { q: "ما هي مخرجات typeof null؟", opts: ["null", "undefined", "object"], correct: 2, level: "محترف" }
-
         ];
-
-
 
         const lessonsData = [
-
             { id: 1, title: "المتغيرات (Variables)", short: "تعلم كيفية تخزين البيانات باستخدام let و const.", full: "المتغيرات هي الأساس في أي لغة برمجة، فهي تسمح لنا بحفظ القيم لاستخدامها لاحقاً. في جافاسكربت الحديثة، نبتعد عن 'var' ونستخدم 'const' للقيم التي لا نريد تغييرها، و 'let' للقيم التي قد تتغير خلال عمل البرنامج. هذا يحسن من أداء الكود ويمنع الأخطاء غير المتوقعة.", summary: "المتغيرات هي حاويات للبيانات؛ استخدم const للثوابت و let للمتغيرات القابلة للتغيير.", code: "const name = 'Ali';\nlet age = 25;\nage = 26;\nconsole.log(name, age);", output: "Ali 26" },
-
             { id: 2, title: "أنواع البيانات (Data Types)", short: "الفرق بين النصوص، الأرقام، والقيم المنطقية.", full: "جافاسكربت تتعامل مع أنواع مختلفة من البيانات. أهمها النصوص (Strings) التي نضعها بين علامات تنصيص، والأرقام (Numbers) سواء كانت صحيحة أو عشرية، والقيم المنطقية (Booleans) التي تكون إما true أو false. فهم هذه الأنواع يساعدك في إجراء العمليات الحسابية والمنطقية بشكل صحيح.", summary: "يوجد أنواع أساسية: String للنصوص، Number للأرقام، و Boolean للصح والخطأ.", code: "let price = 99.99;\nlet isOpen = true;\nconsole.log(typeof price);", output: "number" },
-
             { id: 3, title: "الدوال (Functions)", short: "كيفية كتابة كود قابل لإعادة الاستخدام.", full: "الدالة هي كتلة من الأكواد تنفذ مهمة محددة عند استدعائها. بدلاً من تكرار الكود 10 مرات، نضعه داخل دالة ونقوم باستدعاء اسم الدالة فقط. هذا يجعل الكود أكثر تنظيماً وسهولة في التعديل. يمكن للدوال أن تأخذ مدخلات (Parameters) وتعيد مخرجات (Return).", summary: "الدوال هي مصنع للأكواد؛ تكتبها مرة واحدة وتستخدمها في أي مكان.", code: "function greet(user) {\n  return 'أهلاً ' + user;\n}\nconsole.log(greet('أحمد'));", output: "أهلاً أحمد" },
-
             { id: 4, title: "المصفوفات (Arrays)", short: "تخزين قوائم من البيانات في متغير واحد.", full: "المصفوفات تتيح لنا تخزين قائمة من العناصر في متغير واحد، حيث يتم الوصول لكل عنصر عبر رقم يسمى 'الفهرس' (Index). تذكر دائماً أن العد في البرمجة يبدأ من الصفر، لذا العنصر الأول فهرسه هو 0. يمكنك إضافة، حذف، أو تعديل العناصر داخل المصفوفة بسهولة.", summary: "المصفوفة هي قائمة مرتبة من البيانات، والعد فيها يبدأ دائماً من الرقم 0.", code: "let fruits = ['تفاح', 'موز'];\nconsole.log(fruits[0]);", output: "تفاح" },
-
             { id: 5, title: "الكائنات (Objects)", short: "توصيف البيانات المعقدة بشكل منظم.", full: "الكائنات هي وسيلة لتمثيل الأشياء الحقيقية في الكود. بدلاً من تعريف عدة متغيرات لشخص واحد، نجمعها في كائن يحتوي على (Key) و (Value). مثل كائن السيارة الذي يحتوي على اللون، الموديل، والسرعة. هو حجر الأساس في بناء تطبيقات كبيرة ومنظمة.", summary: "الكائنات تجمع الخصائص المرتبطة ببعضها في وحدة واحدة (مفتاح وقيمة).", code: "const car = { brand: 'Toyota', year: 2023 };\nconsole.log(car.brand);", output: "Toyota" },
-
             { id: 6, title: "الشروط (If Statement)", short: "اتخاذ القرارات برمجياً بناءً على القيم.", full: "الجمل الشرطية تسمح للبرنامج بالتحرك في مسارات مختلفة. 'إذا' تحقق الشرط، نفذ الكود 'أ'، وإلا نفذ الكود 'ب'. هذا هو الذكاء في البرمجة، حيث يتفاعل البرنامج مع المستخدم بناءً على المدخلات، مثل التحقق من كلمة المرور أو السن المسموح.", summary: "استخدم if لتنفيذ كود معين فقط عند تحقق شرط منطقي محدد.", code: "let score = 80;\nif(score >= 50) {\n  console.log('ناجح');\n}", output: "ناجح" },
-
             { id: 7, title: "الحلقات (Loops)", short: "تكرار المهام بشكل آلي وسريع.", full: "الحلقات التكرارية تستخدم لتنفيذ نفس الكود عدة مرات دون الحاجة لكتابته يدوياً. أشهرها حلقة 'for'. هي مفيدة جداً عند التعامل مع المصفوفات، حيث تمر الحلقة على كل عنصر وتجري عليه عملية معينة في أجزاء من الثانية.", summary: "الحلقات (Loops) توفر الوقت بتمكين البرنامج من تكرار المهام تلقائياً.", code: "for(let i=1; i<=3; i++) {\n  console.log('خطوة ' + i);\n}", output: "خطوة 1, خطوة 2, خطوة 3" }
-
         ];
-
-
 
         const challengesData = [
-
             { id: 1, level: "سهل", q: "عرّف متغير ثابت باسم SITE قيمته 'Google'", ans: "const SITE = 'Google';" },
-
             { id: 2, level: "سهل", q: "ما هو ناتج 5 + '5'؟", ans: "55" },
-
             { id: 3, level: "متوسط", q: "اكتب دالة باسم hi تعيد كلمة 'أهلاً'", ans: "function hi(){return 'أهلاً';}" },
-
             { id: 4, level: "متوسط", q: "كيف نصل للعنصر الأول في مصفوفة اسمها arr؟", ans: "arr[0]" },
-
             { id: 5, level: "صعب", q: "ما هو نوع البيانات للـ NaN؟", ans: "number" },
-
             { id: 6, level: "صعب", q: "حول النص '10' إلى رقم صحيح", ans: "parseInt('10')" },
-
             { id: 7, level: "متوسط", q: "ما هو مخرج console.log(typeof true)؟", ans: "boolean" },
-
             { id: 8, level: "سهل", q: "أوجد باقي قسمة 10 على 3", ans: "1" },
-
             { id: 9, level: "صعب", q: "كيف نتحقق من طول مصفوفة اسمها users؟", ans: "users.length" },
-
-            { id: 10, level: "متوسط", q: "كلمة مفتاحية للمتغيرات القابلة للتغيير؟", ans: "let" }
-
+            { id: 10, level: "متوسط", q: "كلمة مفتاحية للمتغيرات القابلة للتغيير؟", ans: "let" },
+            { id: 11, level: "سهل", q: "كيف تطبع كلمة 'Hello' في الكونسول؟", ans: "console.log('Hello');" },
+            { id: 12, level: "متوسط", q: "ما هو ناتج 10 === '10'؟", ans: "false" },
+            { id: 13, level: "سهل", q: "عرّف مصفوفة فارغة باسم myArr", ans: "const myArr = [];" },
+            { id: 14, level: "متوسط", q: "أضف القيمة 5 لنهاية مصفوفة اسمها nums", ans: "nums.push(5);" },
+            { id: 15, level: "صعب", q: "كيف نصل لخصيصة name داخل كائن user؟", ans: "user.name" },
+            { id: 16, level: "متوسط", q: "ما هي الكلمة لإرجاع قيمة من دالة؟", ans: "return" },
+            { id: 17, level: "سهل", q: "ما ناتج !!true؟", ans: "true" },
+            { id: 18, level: "صعب", q: "دالة لتقريب الرقم 4.7 لأقرب عدد صحيح أكبر؟", ans: "Math.ceil(4.7)" },
+            { id: 19, level: "متوسط", q: "كيف تبدأ حلقة for؟ (اكتب الجزء الأول فقط لـ i=0)", ans: "for(let i=0" },
+            { id: 20, level: "محترف", q: "ما هي الطريقة للتأكد من أن القيمة ليست رقماً؟", ans: "isNaN()" }
         ];
 
-
-
         let points = 0;
-
         let currentAssessIdx = 0;
-
         let assessScore = 0;
-
-
+        let currentChallengeIdx = 0;
 
         function navigateTo(viewId) {
-
             document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
-
             document.getElementById('view-' + viewId).classList.remove('hidden');
-
             window.scrollTo(0,0);
-
         }
 
-
-
-        function startAssessment() { navigateTo('assessment'); renderAssessQ(); }
-
-
+        function startAssessment() { 
+            currentAssessIdx = 0;
+            assessScore = 0;
+            navigateTo('assessment'); 
+            renderAssessQ(); 
+        }
 
         function renderAssessQ() {
-
             const q = assessmentQs[currentAssessIdx];
-
             document.getElementById('diff-tag').innerText = `صعوبة السؤال: ${q.level}`;
-
             document.getElementById('assess-q-text').innerText = q.q;
-
             const container = document.getElementById('assess-options');
-
             container.innerHTML = '';
-
             q.opts.forEach((opt, i) => {
-
                 const b = document.createElement('button');
-
                 b.className = 'lesson-btn';
-
                 b.innerText = opt;
-
                 b.onclick = () => {
-
                     if(i === q.correct) assessScore++;
-
                     currentAssessIdx++;
-
                     if(currentAssessIdx < assessmentQs.length) renderAssessQ();
-
                     else showWelcome();
-
                 };
-
                 container.appendChild(b);
-
             });
-
         }
-
-
 
         function showWelcome() {
-
             let levelLabel = "مبتدئ (Junior)";
-
             if(assessScore >= 4) levelLabel = "محترف (Senior)";
-
             else if(assessScore >= 2) levelLabel = "متوسط (Mid-Level)";
 
-
-
             document.getElementById('level-msg').innerText = `أحسنت! نتيجتك هي ${assessScore}/5. مسارك التعليمي المخصص هو: ${levelLabel}. استكشف الأزرار أدناه وانطلق!`;
-
             navigateTo('welcome');
-
         }
-
-
 
         function renderLessons() {
-
             const list = document.getElementById('lessons-list');
-
             list.innerHTML = lessonsData.map(l => `
-
                 <div class="lesson-btn" onclick="viewLessonDetail(${l.id})">
-
                     <h3 style="color:var(--primary)">${l.title}</h3>
-
                     <p style="font-size:0.9rem; opacity:0.8">${l.short}</p>
-
                 </div>
-
             `).join('');
-
         }
-
-
 
         function viewLessonDetail(id) {
-
             const l = lessonsData.find(x => x.id === id);
-
             document.getElementById('lesson-content').innerHTML = `
-
                 <h1 style="color:var(--primary); margin-bottom:20px">${l.title}</h1>
-
                 <p style="font-size:1.1rem; line-height:1.8; margin-bottom:20px">${l.full}</p>
-
                 <div style="background:rgba(247,223,30,0.1); padding:15px; border-radius:10px; margin-bottom:20px">
-
                     <strong style="color:var(--primary)">الاختصار:</strong>
-
                     <p>${l.summary}</p>
-
                 </div>
-
                 <strong style="display:block; margin-bottom:10px italic">مثال برمجي:</strong>
-
                 <code>${l.code}</code>
-
                 <strong>المخرج المتوقع:</strong>
-
                 <div class="output-box">${l.output}</div>
-
             `;
-
             navigateTo('lesson-detail');
-
         }
 
+        function startChallengeSequence() {
+            currentChallengeIdx = 0;
+            navigateTo('challenges');
+            renderSingleChallenge();
+        }
 
+        function renderSingleChallenge() {
+            const container = document.getElementById('challenge-box-container');
+            if (currentChallengeIdx >= challengesData.length) {
+                showFinalResults();
+                return;
+            }
 
-        function renderChallenges() {
-
-            const list = document.getElementById('challenges-list');
-
-            list.innerHTML = challengesData.map(c => `
-
-                <div class="quiz-card" style="margin:0; max-width:100%">
-
-                    <span style="font-size:0.7rem; background:#444; padding:3px 10px; border-radius:5px">${c.level}</span>
-
-                    <p style="margin:15px 0; font-weight:bold">${c.q}</p>
-
-                    <input type="text" id="ans-${c.id}" placeholder="اكتب الحل هنا...">
-
-                    <button class="btn-primary" style="width:100%" onclick="checkAns(${c.id})">إرسال الإجابة</button>
-
-                    <p id="msg-${c.id}" style="margin-top:10px; font-weight:bold"></p>
-
+            const c = challengesData[currentChallengeIdx];
+            container.innerHTML = `
+                <div class="quiz-card" data-aos="fade-left" style="max-width:100%">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:10px">
+                        <span style="font-size:0.7rem; background:#444; padding:3px 10px; border-radius:5px">${c.level}</span>
+                        <span style="font-size:0.8rem; color:var(--primary)">سؤال ${currentChallengeIdx + 1} من 20</span>
+                    </div>
+                    <p style="margin:15px 0; font-weight:bold; font-size:1.2rem">${c.q}</p>
+                    <input type="text" id="active-ans" placeholder="اكتب الحل هنا..." autocomplete="off">
+                    
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px">
+                        <button class="btn-primary" onclick="checkCurrentAns()">إرسال الإجابة</button>
+                        <button class="btn-primary" style="background:#555; color:#fff" onclick="skipChallenge()">تخطي (Skip)</button>
+                    </div>
+                    
+                    <button onclick="showFinalResults()" style="width:100%; margin-top:10px; background:transparent; border:1px solid #ff4d4d; color:#ff4d4d; padding:10px; border-radius:10px; cursor:pointer">خروج وإنهاء</button>
+                    
+                    <p id="active-msg" style="margin-top:15px; font-weight:bold; text-align:center"></p>
                 </div>
-
-            `).join('');
-
+            `;
+            document.getElementById('active-ans').focus();
         }
 
-
-
-        function checkAns(id) {
-
-            const input = document.getElementById(`ans-${id}`);
-
-            const msg = document.getElementById(`msg-${id}`);
-
-            const challenge = challengesData.find(x => x.id === id);
-
-
+        function checkCurrentAns() {
+            const input = document.getElementById('active-ans');
+            const msg = document.getElementById('active-msg');
+            const challenge = challengesData[currentChallengeIdx];
 
             if(input.value.trim() === "") {
-
                 input.classList.add('error-input');
-
                 setTimeout(() => input.classList.remove('error-input'), 500);
-
                 return;
-
             }
-
-
 
             if(input.value.trim().replace(/\s/g, '') === challenge.ans.replace(/\s/g, '')) {
-
-                input.style.borderColor = "#4eff4e";
-
-                input.disabled = true;
-
-                msg.innerHTML = "✅ إجابة مذهلة! +20 نقطة";
-
-                msg.style.color = "#4eff4e";
-
                 points += 20;
-
                 document.getElementById('pts').innerText = points;
-
+                msg.innerHTML = "✅ رائع! +20 نقطة";
+                msg.style.color = "#4eff4e";
+                setTimeout(() => {
+                    currentChallengeIdx++;
+                    renderSingleChallenge();
+                }, 1000);
             } else {
-
                 input.classList.add('error-input');
-
-                msg.innerHTML = "❌ حاول مجدداً، ركز في الكود!";
-
+                msg.innerHTML = "❌ خطأ، حاول مرة أخرى";
                 msg.style.color = "#ff4d4d";
-
                 setTimeout(() => input.classList.remove('error-input'), 500);
-
             }
-
         }
 
+        function skipChallenge() {
+            currentChallengeIdx++;
+            renderSingleChallenge();
+        }
 
+        function showFinalResults() {
+            const container = document.getElementById('challenge-box-container');
+            container.innerHTML = `
+                <div class="quiz-card" style="text-align:center">
+                    <h2 style="color:var(--primary)">انتهى الاختبار! 🏁</h2>
+                    <p style="font-size:1.3rem">لقد جمعت: <strong>${points}</strong> نقطة</p>
+                    <p>عدد الأسئلة التي مررت بها: ${currentChallengeIdx}</p>
+                    <button class="btn-primary" style="width:100%" onclick="navigateTo('welcome')">العودة للرئيسية</button>
+                </div>
+            `;
+        }
 
         AOS.init({ duration: 800 });
-
         renderLessons();
-
-        renderChallenges();
-
         
-
         document.getElementById('themeToggle').onclick = () => {
-
             const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-
             document.documentElement.setAttribute('data-theme', theme);
-
+            document.getElementById('themeToggle').innerText = theme === 'dark' ? '🌙' : '☀️';
         };
-
     </script>
-
 </body>
-
 </html>
